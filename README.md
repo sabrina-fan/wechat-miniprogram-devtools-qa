@@ -1,15 +1,48 @@
 # wechat-miniprogram-devtools-qa
 
-微信小程序在开发者工具里的协议优先验收与调试 AI agent skill。
+Protocol-first acceptance and debugging for WeChat Mini Programs in WeChat Developer Tools. Verify real page behavior through the automator protocol, API probes, and read-only database checks — with Computer Use only as a last-resort fallback.
 
-用 CLI + `miniprogram-automator` 做 DOM 几何/路由/API 流程验证，Computer Use 仅作最后兜底。每次验证前必须走 clean-build gate（项目级清缓存 + 重新编译），不接受用构建成功或源码审查代替实际运行验收。截图、DOM 几何、API 响应、服务端日志都算证据，但单独一个不够——要交叉验证。
+## Why
 
-和 rebuild-miniprogram（重建）、wechat-devtools-automation-recovery（恢复）组成小程序开发验证的完整链路。
+Screenshots, DOM geometry, API responses, and server logs are the only real evidence that a mini-program works. A successful build or source-code inspection alone is not acceptance. This skill enforces a clean-build gate, current-working-tree provenance, and a layered verification chain so you never mistake a stale artifact for working software.
 
-## 安装
+## Install
 
-把 `SKILL.md`（及 `agents/`、`references/` 子目录如有）复制到你的 agent skill 目录下即可。
+### Option A — let your agent install it
 
-## License
+Give your agent this repo URL and ask it to add the skill:
 
-MIT
+```
+https://github.com/sabrina-fan/wechat-miniprogram-devtools-qa
+```
+
+### Option B — manual
+
+Copy the `wechat-miniprogram-devtools-qa/` directory into your agent's skills folder (e.g. `~/.zcode/skills/` or your agent's configured skills directory).
+
+## Configuration
+
+- **DevTools CLI path**: auto-detected on macOS (`/Applications/wechatwebdevtools.app/Contents/MacOS/cli`).
+- **Ports**: IDE HTTP defaults to `9420`, automation WebSocket defaults to `9422` — auto-discovered via `lsof`.
+- **miniprogram-automator**: install with `npm i miniprogram-automator` in a disposable workspace if not present.
+- **Project paths**: detected from `package.json` and project structure. No hardcoded paths or API keys required.
+
+## Usage
+
+Trigger it when you need to verify mini-program behavior in DevTools. The skill follows this verification chain:
+
+1. **Clean-build gate** — clear `file`/`compile` caches, rebuild from current working tree, verify compiled markers.
+2. **Stack health** — start the local stack, check health endpoints.
+3. **Protocol automation** — connect via `miniprogram-automator`, navigate, evaluate, screenshot.
+4. **API probes** — test endpoints before UI actions when an equivalent API exists.
+5. **Read-only DB probes** — locate data boundaries with `SELECT`-only queries.
+6. **Computer Use fallback** — only when every protocol path is exhausted.
+
+## Compatibility
+
+- **macOS** — primary platform (uses `lsof`, macOS DevTools CLI paths, Computer Use for GUI).
+- **Windows / Linux** — adapt CLI paths and process inspection commands to the local platform.
+
+## Security & Boundary
+
+This skill verifies behavior; it does not write or modify source code unless explicitly asked. It never prints `.env`, tokens, cookies, passwords, or user identifiers. All test data uses mock/loopback identities and is cleaned up when practical. No production data is used.
