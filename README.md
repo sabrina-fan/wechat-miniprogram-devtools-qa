@@ -1,48 +1,48 @@
 # wechat-miniprogram-devtools-qa
 
-Protocol-first acceptance and debugging for WeChat Mini Programs in WeChat Developer Tools. Verify real page behavior through the automator protocol, API probes, and read-only database checks — with Computer Use only as a last-resort fallback.
+协议优先的微信小程序验收与调试。通过自动化协议、API 探针和只读数据库检查来验证真实页面行为——Computer Use 仅作为最后的兜底手段。
 
-## Why
+## 为什么需要
 
-Screenshots, DOM geometry, API responses, and server logs are the only real evidence that a mini-program works. A successful build or source-code inspection alone is not acceptance. This skill enforces a clean-build gate, current-working-tree provenance, and a layered verification chain so you never mistake a stale artifact for working software.
+截图、DOM 几何、API 响应和服务端日志才是小程序能否正常工作的真实证据。仅凭构建成功或源码审查不能算验收通过。这个 skill 强制执行清洁构建门禁、当前工作树溯源和分层验证链，确保不会把过时产物误当成可运行的软件。
 
-## Install
+## 安装
 
-### Option A — let your agent install it
+### 方式 A — 交给 agent 安装
 
-Give your agent this repo URL and ask it to add the skill:
+把仓库地址给你的 agent，让它安装：
 
 ```
 https://github.com/sabrina-fan/wechat-miniprogram-devtools-qa
 ```
 
-### Option B — manual
+### 方式 B — 手动安装
 
-Copy the `wechat-miniprogram-devtools-qa/` directory into your agent's skills folder (e.g. `~/.zcode/skills/` or your agent's configured skills directory).
+把 `wechat-miniprogram-devtools-qa/` 目录复制到你的 agent skill 目录下。
 
-## Configuration
+## 配置
 
-- **DevTools CLI path**: auto-detected on macOS (`/Applications/wechatwebdevtools.app/Contents/MacOS/cli`).
-- **Ports**: IDE HTTP defaults to `9420`, automation WebSocket defaults to `9422` — auto-discovered via `lsof`.
-- **miniprogram-automator**: install with `npm i miniprogram-automator` in a disposable workspace if not present.
-- **Project paths**: detected from `package.json` and project structure. No hardcoded paths or API keys required.
+- **开发者工具 CLI 路径**：macOS 下自动检测（`/Applications/wechatwebdevtools.app/Contents/MacOS/cli`）。
+- **端口**：IDE HTTP 默认 `9420`，自动化 WebSocket 默认 `9422`，通过 `lsof` 自动发现。
+- **miniprogram-automator**：如未安装，在临时工作区执行 `npm i miniprogram-automator`。
+- **项目路径**：从 `package.json` 和项目结构自动检测，无需硬编码路径或 API key。
 
-## Usage
+## 使用方法
 
-Trigger it when you need to verify mini-program behavior in DevTools. The skill follows this verification chain:
+需要在开发者工具里验证小程序行为时触发。skill 按以下验证链执行：
 
-1. **Clean-build gate** — clear `file`/`compile` caches, rebuild from current working tree, verify compiled markers.
-2. **Stack health** — start the local stack, check health endpoints.
-3. **Protocol automation** — connect via `miniprogram-automator`, navigate, evaluate, screenshot.
-4. **API probes** — test endpoints before UI actions when an equivalent API exists.
-5. **Read-only DB probes** — locate data boundaries with `SELECT`-only queries.
-6. **Computer Use fallback** — only when every protocol path is exhausted.
+1. **清洁构建门禁** — 清 `file`/`compile` 缓存，从当前工作树重新构建，验证编译标记。
+2. **服务栈健康** — 启动本地服务栈，检查健康端点。
+3. **协议自动化** — 通过 `miniprogram-automator` 连接、导航、求值、截图。
+4. **API 探针** — 有等效端点时，在 UI 操作之前先测 API。
+5. **只读数据库探针** — 用纯 `SELECT` 查询定位数据边界。
+6. **Computer Use 兜底** — 仅当所有协议路径都无法使用时。
 
-## Compatibility
+## 兼容性
 
-- **macOS** — primary platform (uses `lsof`, macOS DevTools CLI paths, Computer Use for GUI).
-- **Windows / Linux** — adapt CLI paths and process inspection commands to the local platform.
+- **macOS** — 主要平台（使用 `lsof`、macOS 开发者工具 CLI 路径、Computer Use 驱动 GUI）。
+- **Windows / Linux** — 需按平台适配 CLI 路径和进程检查命令。
 
-## Security & Boundary
+## 安全与边界
 
-This skill verifies behavior; it does not write or modify source code unless explicitly asked. It never prints `.env`, tokens, cookies, passwords, or user identifiers. All test data uses mock/loopback identities and is cleaned up when practical. No production data is used.
+这个 skill 只验证行为；除非明确要求，不写或改源码。绝不打印 `.env`、token、cookie、密码或用户标识。所有测试数据使用 mock/loopback 身份，测试结束后尽量清理。不使用生产数据。
